@@ -1,0 +1,49 @@
+function ucKucdx = grad_mean_flex(str,n,x,p,uc,kel,nonempty,kmax)
+%**************************************************************************
+%ucKucdx = grad_mean_flex(str,n,x,p,uc,kel,nonempty,kmax)
+%
+%This function computes the mean flexibility gradient vector for 
+%compliant mechanisms when no filter is applied.
+%
+%*Nishiwaki, S.; Frecker, M. I.; Seungjae, M.; Kikuchi, N.; Topology
+%optimization of compliant mechanisms using the homogenization method.
+%International Journal for Numerical Methods in Engineering, 42, 1998, p.
+%535-559.
+%
+%INPUT PARAMETERS:
+%-----------------
+%str: Structure with the problem data.
+%n: Number of elements of a rectangular domain.
+%x: Vector of original element densities.
+%p: Penalty parameter of the SIMP model for the element densities.
+%uc: Vector of nodal displacements associated to the reaction force in the
+%    second load case (Nishiwaki et al. formulation*).
+%kel: Element stiffness matrix.
+%nonempty: Vector with the indexes of the finite elements that are
+%          nonempty.
+%kmax: Number of nonempty elements.
+%
+%OUTPUT PARAMETER:
+%-----------------
+%ucKucdx: Mean flexibility gradient vector for compliant mechanisms, 
+%         when no filter is applied.
+%**************************************************************************
+
+ucKucdx = zeros(n,1);
+lin = zeros(8,1);
+ny = str.ny;
+k = ny-1; 
+
+for i = 1:kmax
+    m1 = nonempty(i);
+    lin(2) = 2*((floor((m1-1)/k))*ny+mod(m1-1,k)+1); 
+    lin(4) = lin(2) + 2*ny;
+    lin(6) = lin(4) + 2;
+    lin(8) = lin(2) + 2;
+    lin(1) = lin(2) - 1;
+    lin(3) = lin(4) - 1;
+    lin(5) = lin(6) - 1;
+    lin(7) = lin(8) - 1;
+    ucel = uc(lin);
+    ucKucdx(m1) = -p*(x(m1)^(p-1))*(ucel'*(kel*ucel));
+end
