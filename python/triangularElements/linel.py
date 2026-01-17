@@ -2,8 +2,7 @@ from numpy import zeros
 
 def linel(struct):
     nelemy = struct["nelemy"][0]
-    nelemx = struct["nelemx"][0]
-    nelem = int((nelemy * nelemx)/2)
+    nelem = int(struct["nelem"])
     nsquare = int(nelem/2)
     lin = zeros((6, nelem))
 
